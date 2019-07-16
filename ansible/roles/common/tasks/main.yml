@@ -1,0 +1,59 @@
+#Install all common packages that are needed for all projects 
+- name : install aptititude
+  apt: 
+    name: aptitude
+# - name: Update all packages to the latest version
+#   apt:
+#     upgrade: yes
+
+- name: Install a list of packages
+  apt:
+    name: "{{ packages }}"
+  vars:
+    packages:
+    - software-properties-common
+    - wget
+    - curl
+    - git
+    - dnsutils
+    - zip
+    - unzip
+
+- name: debian | ensure the apt repository key is present 
+  apt_key:
+    id: EA8CACC073C3DB2A
+    keyserver: keyserver.ubuntu.com
+    state: present
+- name: debian | ensure the apt repository is present
+  apt_repository:
+    repo: deb http://ppa.launchpad.net/linuxuprising/java/ubuntu bionic main
+    update_cache: yes
+    state: present
+
+- name: debian | set license as accepted
+  debconf:
+    name: oracle-java12-installer
+    question: shared/accepted-oracle-license-v1-2
+    value: 'true'
+    vtype: 'select'
+- name: debian | set license as accepted
+  debconf:
+    name: oracle-java12-installer
+    question: shared/accepted-oracle-license-v1-2
+    value: 'true'
+    vtype: 'seen'
+
+- name: debian | ensure Java is installed
+  apt:
+    name: oracle-java12-installer
+    state: present
+    cache_valid_time: 3600
+    update_cache: yes
+  register: oracle_java_task_apt_install
+# - name: debian | set Java version as default
+#   apt:
+#     name=oracle-java12-set-default
+#     state=present
+#   register: oracle_java_task_set_default
+#   when: oracle_java_set_as_default
+    
